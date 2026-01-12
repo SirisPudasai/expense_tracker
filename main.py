@@ -1,10 +1,12 @@
 from database import get_connection, create_table
+import calendar ,csv
 from queries import (
     add_expense,
     get_all_expenses,
     update_expenses,
     delete_expenses,
     get_monthly_total,
+    get_yearly_total,
     get_category_breakdown
 )
 
@@ -14,7 +16,9 @@ def show_menu():
     print("2. View All Expenses")
     print("3. Update Expense")
     print("4. Delete Expense")
-    print("5. Category-wise Breakdown")
+    print("5. Yearly Summary Report")
+    print("6. Monthly report")
+    print("7. Export yearly report to CSV")
     print("0. Exit")
 
 def main():
@@ -71,8 +75,43 @@ def main():
             
 
         elif choice == "5":
-            print("Category breakdown selected")
-
+            year=input('Enter Year:')
+            tot_amt=get_yearly_total(conn,year)
+            rows=get_category_breakdown(conn,year)
+            print(f'YEARLY EXPENSE REPORT({year}) ')
+            print('-------------------------------')
+            print(f'Total Expense:{tot_amt}'  )
+            print('\n')
+            print('Category Breakdown:')
+            for category,amount in rows:
+                print(f'{category:<15}: {amount}') # '<' → left-align , 15 -> min width i.e 15 character wide
+        elif choice == "6":
+            year=input('Enter Year:')
+            month=input('Enter month:').zfill(2)
+            total=get_monthly_total(conn,year,month)
+            rows=get_category_breakdown(conn,year,month)
+            month_name = calendar.month_name[int(month)]
+            print(f'Monthly Report : {month_name} {year}')
+            print(f'Monthly total: {total}')
+            print('Category Breakdown:')
+            for category,amount in rows:
+                print(f'{category:<15}: {amount}')
+        elif choice == "7":
+            year=input('Enter year:')
+            rows=get_category_breakdown(conn,year)
+            if not rows:
+                print('No data available for this year')
+            else:
+                filename=f'expense_report_{year}.csv'
+                
+                with open(filename,'w',newline="",encoding='utf-8') as f:
+                     writer=csv.writer(f)
+                     writer.writerow(['year','category','Total_amount'])
+                     for category,amount in rows:
+                         writer.writerow([year,category,amount])
+                         
+                print(f"Report exported successfully to {filename}")
+            
         elif choice == "0":
             print("Goodbye 👋")
             break
