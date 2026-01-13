@@ -1,5 +1,5 @@
 from database import get_connection, create_table
-import calendar ,csv
+import calendar ,csv,matplotlib.pyplot as plt
 from queries import (
     add_expense,
     get_all_expenses,
@@ -19,6 +19,7 @@ def show_menu():
     print("5. Yearly Summary Report")
     print("6. Monthly report")
     print("7. Export yearly report to CSV")
+    print("8. Plot category-wise expenses")
     print("0. Exit")
 
 def main():
@@ -111,6 +112,28 @@ def main():
                          writer.writerow([year,category,amount])
                          
                 print(f"Report exported successfully to {filename}")
+            
+        elif choice == "8":
+            import matplotlib.pyplot as plt
+            import csv
+            year=input('Enter year:')
+            filename =f'expense_report_{year}.csv'
+            categories=[]
+            amounts=[]
+            with open(filename,'r',encoding='utf-8') as f:
+                reader=csv.reader(f)
+                next(reader)
+                for _,category,amount in reader:
+                    categories.append(category)
+                    amounts.append(float(amount))
+            
+            plt.bar(categories,amounts)
+            plt.xlabel('Categories')
+            plt.ylabel('Amount')
+            plt.title(f'Expense_report {year}')
+            plt.show()
+            
+            
             
         elif choice == "0":
             print("Goodbye 👋")
