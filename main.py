@@ -136,11 +136,11 @@ def main():
             
             
         elif choice == "0":
-            print("Goodbye 👋")
+            print("Goodbye ")
             break
 
         else:
-            print("Invalid choice ❌")
+            print("Invalid choice ")
 
     conn.close()
 
